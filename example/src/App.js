@@ -1,13 +1,65 @@
-import React from 'react'
+import * as React from 'react'
+import styled from 'styled-components'
 
-import { useMyHook } from 'use-styled-slider'
+import { useStyledSlider, Container, Item } from 'use-styled-slider'
+
+const itemsFromApi = [
+    {
+        name: 'Someone',
+        job: 'Important',
+        quote: "It's a pretty cool slider",
+    },
+]
+
+const initialQuote = {
+    name: 'Someone',
+    job: 'Important',
+    quote: "It's a pretty cool slider",
+}
+
+const getQuotes = () => {
+    return new Promise((resolve) =>
+        setTimeout(() => {
+            resolve(itemsFromApi)
+        }, 1000),
+    )
+}
 
 const App = () => {
-  const example = useMyHook()
-  return (
-    <div>
-      {example}
-    </div>
-  )
+    React.useEffect(() => {
+        getQuotes().then((quotes) => {
+            addItems(quotes)
+        })
+    }, [])
+    const { items, addItem, removeItem, addItems } = useStyledSlider({
+        initialItems: initialQuote,
+        itemsPerSlide: 1,
+        gap: 15,
+    })
+    return (
+        <Wrapper>
+            {/* <button>Next</button>
+      <button>Prev</button>
+      <Container>
+        {items.map((item) => {
+          return (
+            <Item>
+              <div>
+                <img src="//placehold.it/30" alt="Placeholder" />
+              </div>
+            </Item>
+          );
+        })}
+      </Container>
+      <button onClick={addItem}>Add new item </button> */}
+        </Wrapper>
+    )
 }
 export default App
+
+const Wrapper = styled.div`
+    background: lavenderBlush;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+`
