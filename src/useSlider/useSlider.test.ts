@@ -1,23 +1,26 @@
-import useStyledSlider, { useStyledSlider as namedHook, UseStyledSliderProps } from './useStyledSlider'
+import useSlider, {
+    useSlider as namedHook,
+    UseSliderProps,
+} from './useSlider'
 import { renderHook, act } from '@testing-library/react-hooks'
 
 test('exports a function (default)', () => {
-    expect(useStyledSlider).toBeInstanceOf(Function)
+    expect(useSlider).toBeInstanceOf(Function)
 })
 test('exports a function (named)', () => {
     expect(namedHook).toBeInstanceOf(Function)
 })
 test('hooks identity are the same', () => {
-    expect(useStyledSlider).toBe(namedHook)
+    expect(useSlider).toBe(namedHook)
 })
 test('is a named function', () => {
     // aids stack trace debugging.
-    expect(useStyledSlider.name).toBe('useStyledSlider')
+    expect(useSlider.name).toBe('useSlider')
 })
-describe('useStyledSlider', () => {
+describe('useSlider', () => {
     test('Basic slider functionality', () => {
-        const { result, rerender } = renderHook((props: UseStyledSliderProps<{ boo: number | string }>) =>
-            useStyledSlider(props)
+        const { result, rerender } = renderHook((props: UseSliderProps<{ boo: number | string }>) =>
+            useSlider(props)
         )
         rerender({ initialSlides: [{ boo: '1' }] })
 
@@ -144,5 +147,7 @@ describe('useStyledSlider', () => {
         act(() => result.current.resetSlides())
         // Assert slides to be reset to initial slides
         expect(result.current.slides).toEqual([{ boo: '1' }])
+
+        expect(result.current.slideWidth).toEqual(1920)
     })
 })

@@ -33,14 +33,14 @@ export const useDimensions: UseDimensions = (props) => {
         right: 0,
         bottom: 0,
     })
-    const [node, setNode] = useState(null)
+    const [node, setNode] = useState<HTMLElement | null>(null)
 
     const ref = useCallback((currentNode) => {
         setNode(currentNode)
     }, [])
 
     useIsomorphicLayoutEffect(() => {
-        if (node) {
+        if (node !== null) {
             const measure = () => {
                 window.requestAnimationFrame(() => {
                     setDimensions(getDimensionObject(node))

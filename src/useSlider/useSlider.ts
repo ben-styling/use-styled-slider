@@ -1,19 +1,5 @@
 import { useState, useEffect } from 'react'
-import styled from 'styled-components'
 import useDimensions from '../useDimensions'
-
-// const useDimensions = ({ width }: { width: number }) => {
-//     useEffect(() => {
-//         console.log('hey ho')
-//     }, [])
-//     useEffect(() => {
-//         console.log('hey ho')
-//     }, [])
-//     return {
-//         ref: undefined,
-//         dimensions: { width: width },
-//     }
-// }
 
 const canMoveSlide = (index: number, direction: Direction, slideLength: number) => {
     const newIndex = index + direction
@@ -24,14 +10,14 @@ const canMoveSlide = (index: number, direction: Direction, slideLength: number) 
 
 const makeArray = <T,>(data: T | object) => (Array.isArray(data) ? data : [data])
 
-export const useStyledSlider: UseStyledSlider = ({
+export const useSlider: UseSlider = ({
     initialSlides,
     startIndex = 0,
     gutter = 0,
     slidesPerView = 1,
 }) => {
     const {
-        ref,
+        ref: containerRef,
         dimensions: { width: containerWidth },
     } = useDimensions()
 
@@ -41,16 +27,14 @@ export const useStyledSlider: UseStyledSlider = ({
         getSlideWidth()
     }, [containerWidth, slidesPerView, gutter, slidesPerView])
 
-    const [slideWidth, setSlideWidth] = useState(getSlideWidth())
+    const [slideWidth,] = useState(getSlideWidth())
 
-    // const useSpring = motion.useSpring
-    // const set = motion.set
     const [currentIndex, setCurrentIndex] = useState(startIndex)
     const [currentSlide, setCurrentSlide] = useState(startIndex + 1)
     const [hasNextSlide, setHasNextSlide] = useState(false)
     const [hasPrevSlide, setHasPrevSlide] = useState(false)
 
-    const [slides, setSlides] = useState<object[]>(makeArray(initialSlides))
+    const [slides, setSlides] = useState(makeArray(initialSlides))
     const [slideLength, setSlideLength] = useState(
         Array.isArray(initialSlides) ? initialSlides.length : 1
     )
@@ -60,8 +44,12 @@ export const useStyledSlider: UseStyledSlider = ({
     }
     const addSlide: AddSlide = (newSlide) => setSlides((slides) => [...slides, newSlide])
     const addSlides: AddSlides = (newSlides) => newSlides.forEach((slide) => addSlide(slide))
-    const next: Noop = () => setCurrentIndex((currentIndex) => currentIndex + 1)
-    const prev: Noop = () => setCurrentIndex((currentIndex) => currentIndex - 1)
+    const next: Noop = () => {
+        if (hasNextSlide) setCurrentIndex((currentIndex) => currentIndex + 1)
+    }
+    const prev: Noop = () => {
+        if (hasPrevSlide) setCurrentIndex((currentIndex) => currentIndex - 1)
+    }
     const gotoIndex: Goto = (index) => setCurrentIndex(index)
     const gotoSlide: Goto = (slide) => setCurrentIndex(slide - 1)
 
@@ -69,10 +57,9 @@ export const useStyledSlider: UseStyledSlider = ({
         setHasPrevSlide(canMoveSlide(currentIndex, Direction.Left, slideLength))
         setHasNextSlide(canMoveSlide(currentIndex, Direction.Right, slideLength))
     }, [currentIndex, slideLength])
+
     const resetSlides: ResetSlides = (newSlides) => {
-        setSlides(
-            newSlides ? newSlides : Array.isArray(initialSlides) ? initialSlides : [initialSlides]
-        )
+        setSlides(makeArray(newSlides || initialSlides))
         setCurrentIndex(0)
     }
 
@@ -83,7 +70,6 @@ export const useStyledSlider: UseStyledSlider = ({
         setSlideLength(slides.length)
     }, [slides.length])
 
-    const getContainerProps = () => ({ gutter, slidesPerView, ref })
     return {
         slides,
         addSlides,
@@ -99,13 +85,13 @@ export const useStyledSlider: UseStyledSlider = ({
         hasPrevSlide,
         resetSlides,
         containerWidth,
+        containerRef,
+        slideWidth,
+        slideLength
     }
 }
 
-export const Container = styled.div``
-export const Slide = styled.div``
-
-export default useStyledSlider
+export default useSlider
 
 export enum Direction {
     Left = -1,
@@ -114,19 +100,20 @@ export enum Direction {
 
 export type Noop = () => void
 export type Goto = (number: number) => void
-export type AddSlides = (data: object[]) => void
-export type AddSlide = (data: object) => void
+export type AddSlides = <T>(data: T[]) => void
+export type AddSlide = <T>(data: T) => void
 export type RemoveSlide = (slideIndex: number) => void
-export type ResetSlides = (slides?: object[]) => void
-export type UseStyledSliderProps = {
-    initialSlides: object[] | object
+export type ResetSlides = (slides?: any[]) => void
+export type ContainerRef = (currentNode: any) => void
+export type UseSliderProps<T> = {
+    initialSlides: T[]
     startIndex?: number
     slidesPerView?: number
     liveMeasure?: boolean
     gutter?: number
 }
-export type UseStyledSliderResult = {
-    slides: object[]
+export type UseSliderResult<T> = {
+    slides: T[]
     addSlides: AddSlides
     addSlide: AddSlide
     removeSlide: RemoveSlide
@@ -140,5 +127,8 @@ export type UseStyledSliderResult = {
     hasPrevSlide: boolean
     resetSlides: ResetSlides
     containerWidth: number
+    containerRef: ContainerRef
+    slideWidth: number
+    slideLength: number
 }
-export type UseStyledSlider = (props: UseStyledSliderProps) => UseStyledSliderResult
+export type UseSlider = <T = object>(props: UseSliderProps<T>) => UseSliderResult<T>
