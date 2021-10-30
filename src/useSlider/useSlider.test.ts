@@ -1,7 +1,4 @@
-import useSlider, {
-    useSlider as namedHook,
-    UseSliderProps,
-} from './useSlider'
+import useSlider, { useSlider as namedHook, UseSliderProps } from './useSlider'
 import { renderHook, act } from '@testing-library/react-hooks'
 
 test('exports a function (default)', () => {
@@ -150,4 +147,44 @@ describe('useSlider', () => {
 
         expect(result.current.slideWidth).toEqual(1920)
     })
+
+    test('2 slides per view', () => {
+        const { result, rerender } = renderHook((props: UseSliderProps<{ boo: number | string }>) =>
+            useSlider(props)
+        )
+        rerender({
+            initialSlides: [
+                { boo: '1' },
+                { boo: '2' },
+                { boo: '3' },
+                { boo: '4' },
+                { boo: '5' },
+                { boo: '6' },
+            ],
+            slidesPerView: 2,
+        })
+
+        // assert initial slides
+        expect(result.current.containerWidth).toEqual(1920)
+        expect(result.current.slides).toEqual([
+            { boo: '1' },
+            { boo: '2' },
+            { boo: '3' },
+            { boo: '4' },
+            { boo: '5' },
+            { boo: '6' },
+        ])
+
+        expect(result.current.hasNextSlide).toEqual(true)
+        act(() => result.current.next())
+        act(() => result.current.next())
+        expect(result.current.hasNextSlide).toEqual(false)
+        act(() => result.current.next())
+        act(() => result.current.next())
+        act(() => result.current.next())
+        expect(result.current.currentIndex).toEqual(2)
+        expect(result.current.currentSlide).toEqual(3)
+
+    })
 })
+
