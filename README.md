@@ -1,5 +1,7 @@
 # use-styled-slider
 
+This project has been archived, and is not maintained.
+
 > SSR ready carousel slider styled with styled components
 
 [![NPM](https://img.shields.io/npm/v/use-styled-slider.svg)](https://www.npmjs.com/package/use-styled-slider) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
